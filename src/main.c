@@ -66,21 +66,32 @@ int main() {
 
 
     int octets;
-    const char** str = TextSplit(buf, '.', &octets);
+    const char **str = TextSplit(buf, '.', &octets);
     if (octets != 4) {
         printf("Invalid IP");
         return 1;
     }
 
     for (int i = 0; i < subnet_amount; i++) {
+        const int lower = i * hosts_by_subnet;
+        const int upper = (i + 1) * hosts_by_subnet - 1;
+
         switch (class) {
             case 'A':
+                printf("%d. %s.%d.%d.%d - %s.%d.%d.%d\n", i + 1,
+                       str[0], lower / 65536, lower % 65536 / 256, lower  % 256,
+                       str[0], upper / 65536, upper % 65536 / 256, upper % 256);
                 break;
             case 'B':
+
+                printf("%d. %s.%s.%d.%d - %s.%s.%d.%d\n", i + 1,
+                       str[0], str[1], lower / 256, lower  % 256,
+                       str[0], str[1], upper / 256, upper % 256);
                 break;
             case 'C':
-                printf("%d. %s.%s.%s.%d - %s.%s.%s.%d\n", i+1, str[0], str[1], str[2], i * hosts_by_subnet,
-                     str[0], str[1], str[2], (i+1) * hosts_by_subnet-1);
+                printf("%d. %s.%s.%s.%d - %s.%s.%s.%d\n", i + 1,
+                       str[0], str[1], str[2], lower,
+                       str[0], str[1], str[2], upper);
                 break;
         }
     }
