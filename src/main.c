@@ -1,8 +1,9 @@
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdlib.h>
+
 #include "raylib.h"
 
-const char *getIp() {
+ static const char *getIp() {
     static char buf[17];
     printf("IP Address: ");
     scanf("%s", buf);
@@ -11,7 +12,7 @@ const char *getIp() {
     return buf;
 }
 
-const char **parseIp(const char* ip, bool* result) {
+static const char **parseIp(const char* ip, bool* result) {
     int octets;
     const char** str = TextSplit(ip, '.', &octets);
 
@@ -39,6 +40,82 @@ error:
     return nullptr;
 }
 
+static int ipClassToBits(const char ip_class) {
+    switch (ip_class) {
+        case 'A': return 24;
+        case 'B': return 16;
+        case 'C': return 8;
+        default: return 0;
+    }
+}
+
+static int BitsNeededToRepresentNumber(int target) {
+    int bits_needed = 0;
+    while (target > 0) {
+        target /= 2;
+        bits_needed++;
+    }
+
+    return bits_needed;
+}
+
+#define IP_CLASS_A_FORMAT "%d. %s.%d.%d.%d - %s.%d.%d.%d\n", i + 1, \
+                            ip_parts[0], lower / 65536, lower % 65536 / 256, lower % 256, \
+                            ip_parts[0], upper / 65536, upper % 65536 / 256, upper % 256
+#define IP_CLASS_B_FORMAT "%d. %s.%s.%d.%d - %s.%s.%d.%d\n", i + 1, \
+                            ip_parts[0], ip_parts[1], lower / 256, lower % 256, \
+                            ip_parts[0], ip_parts[1], upper / 256, upper % 256
+#define IP_CLASS_C_FORMAT "%d. %s.%s.%s.%d - %s.%s.%s.%d\n", i + 1, \
+                            ip_parts[0], ip_parts[1], ip_parts[2], lower, \
+                            ip_parts[0], ip_parts[1], ip_parts[2], upper
+
+static void writeRangesToConsole(const char** ip_parts, const char ip_class, const int subnet_amount,
+                          const int hosts_by_subnet) {
+    for (int i = 0; i < subnet_amount; i++) {
+        const int lower = i * hosts_by_subnet;
+        const int upper = (i + 1) * hosts_by_subnet - 1;
+        switch (ip_class) {
+            case 'A': printf(IP_CLASS_A_FORMAT);
+                break;
+            case 'B': printf(IP_CLASS_B_FORMAT);
+                break;
+            case 'C': printf(IP_CLASS_C_FORMAT);
+                break;
+            default: exit(EXIT_FAILURE);
+        }
+    }
+}
+
+static void writeRangesToFile(const char** ip_parts, const char ip_class, const int subnet_amount, const int hosts_by_subnet) {
+    FILE* out_file = fopen("output.txt", "w");
+    if (out_file == nullptr) {
+        perror("Error opening output file");
+        return;
+    }
+
+    for (int i = 0; i < subnet_amount; i++) {
+        const int lower = i * hosts_by_subnet;
+        const int upper = (i + 1) * hosts_by_subnet - 1;
+        int result;
+        switch (ip_class) {
+            case 'A': result = fprintf(out_file, IP_CLASS_A_FORMAT);
+                break;
+            case 'B': result = fprintf(out_file, IP_CLASS_B_FORMAT);
+                break;
+            case 'C': result = fprintf(out_file, IP_CLASS_C_FORMAT);
+                break;
+            default: exit(EXIT_FAILURE);
+        }
+
+        if (result <= 0) {
+            perror("Error writing to file");
+            return;
+        }
+    }
+
+    fclose(out_file);
+}
+
 int main() {
     const char* ip = getIp();
 
@@ -53,19 +130,9 @@ int main() {
     printf("Clase de red (A/B/C) : ");
     scanf(" %c", &ip_class);
 
-    int bits_available;
-    switch (ip_class) {
-        case 'A': bits_available = 24;
-            break;
-        case 'B': bits_available = 16;
-            break;
-        case 'C': bits_available = 8;
-            break;
-        default:
-            printf("Invalid IṔ class");
-            return 1;
-            break;
-    }
+    const int bits_available = ipClassToBits(ip_class);
+    if (bits_available == 0) return 1;
+
 
     char value_to_input;
     printf("Subredes (A) o Hosts x Subred (B) : ");
@@ -82,14 +149,13 @@ int main() {
     printf(value_to_input == 'A' ? "Subredes: " : "Hosts x Subred: ");
     scanf("%d", target_value);
 
-    int x = *target_value;
-    int bits_needed = 0;
-    while (x > 0) {
-        x /= 2;
-        bits_needed++;
+    int bits_needed = BitsNeededToRepresentNumber(*target_value);
+    if (bits_needed > bits_available - 2) {
+        printf("There isn't any available IP with these settings.");
+        return 1;
     }
-    *target_value = 1 << bits_needed;
 
+    *target_value = 1 << bits_needed; // Round up to next power if needed
     int* value_to_calculate = value_to_input == 'A' ? &hosts_by_subnet : &subnet_amount;
     *value_to_calculate = 1 << (bits_available - bits_needed);
 
@@ -100,41 +166,8 @@ int main() {
         "Hosts by subnet: %d\n",
         ip, ip_class, subnet_amount, hosts_by_subnet);
 
-
-    constexpr int OUT_BUFFER_SIZE = 1024;
-    constexpr int OUT_BUFFER_LENGTH = 32;
-    char save_buffer[OUT_BUFFER_SIZE * OUT_BUFFER_LENGTH];
-    int in_buffer = 0;
-    for (int i = 0; i < subnet_amount; i++) {
-        const int lower = i * hosts_by_subnet;
-        const int upper = (i + 1) * hosts_by_subnet - 1;
-
-        switch (ip_class) {
-            case 'A':
-                printf("%d. %s.%d.%d.%d - %s.%d.%d.%d\n", i + 1,
-                       ip_parts[0], lower / 65536, lower % 65536 / 256, lower % 256,
-                       ip_parts[0], upper / 65536, upper % 65536 / 256, upper % 256);
-                break;
-            case 'B':
-                printf("%d. %s.%s.%d.%d - %s.%s.%d.%d\n", i + 1,
-                       ip_parts[0], ip_parts[1], lower / 256, lower % 256,
-                       ip_parts[0], ip_parts[1], upper / 256, upper % 256);
-                break;
-
-            case 'C':
-                printf("%d. %s.%s.%s.%d - %s.%s.%s.%d\n", i + 1,
-                       ip_parts[0], ip_parts[1], ip_parts[2], lower,
-                       ip_parts[0], ip_parts[1], ip_parts[2], upper);
-                break;
-            default: ;
-        }
-        // in_buffer++;
-        // if (in_buffer >= OUT_BUFFER_LENGTH) {
-        //     for
-        //     in_buffer = 0;
-        // }
-    }
-
+    writeRangesToConsole(ip_parts, ip_class, subnet_amount, hosts_by_subnet);
+    writeRangesToFile(ip_parts, ip_class, subnet_amount, hosts_by_subnet);
 
     return 0;
 }
