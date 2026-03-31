@@ -95,12 +95,16 @@ int main() {
 
     printf(
         "IP Address: %s\n"
-        "IP Class: %c"
+        "IP Class: %c\n"
         "Total subnets: %d\n"
         "Hosts by subnet: %d\n",
         ip, ip_class, subnet_amount, hosts_by_subnet);
 
 
+    constexpr int OUT_BUFFER_SIZE = 1024;
+    constexpr int OUT_BUFFER_LENGTH = 32;
+    char save_buffer[OUT_BUFFER_SIZE * OUT_BUFFER_LENGTH];
+    int in_buffer = 0;
     for (int i = 0; i < subnet_amount; i++) {
         const int lower = i * hosts_by_subnet;
         const int upper = (i + 1) * hosts_by_subnet - 1;
@@ -124,6 +128,11 @@ int main() {
                 break;
             default: ;
         }
+        // in_buffer++;
+        // if (in_buffer >= OUT_BUFFER_LENGTH) {
+        //     for
+        //     in_buffer = 0;
+        // }
     }
 
 
