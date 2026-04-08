@@ -1,0 +1,37 @@
+#
+# rgl layout text file (v4.0) - raygui layout file generated using rGuiLayout
+#
+# Number of controls:     26
+#
+# Ref. window:    r <x> <y> <width> <height>
+# Anchor info:    a <id> <name> <posx> <posy> <enabled>
+# Control info:   c <id> <type> <name> <rectangle> <anchor_id> <text>
+#
+r 0 40 -1 -1
+a 002 groupbox_anchor 336 16 1
+c 000 4 Label000 24 16 120 24 0 Calculadora de Redes
+c 001 4 Label008 24 48 48 24 0 IP
+c 002 12 in_ip 72 48 120 24 0 SAMPLE TEXT
+c 003 4 Label001 24 80 48 24 0 Clase
+c 004 9 in_ip_class 72 80 40 24 0 A;B;C
+c 005 4 Label006 24 112 48 24 0 Usar
+c 006 9 in_value_type 72 112 120 24 0 Redes;HostsxSubred
+c 007 14 in_value 72 144 120 24 0 Valor    
+c 008 5 btn_calculate 24 176 120 24 0 Calcular
+c 009 1 GroupBox010 0 8 288 360 2 Resultados
+c 010 4 Label010 8 32 120 24 2 # de Redes
+c 011 4 out_nets 128 32 120 24 2 SAMPLE TEXT
+c 012 4 Label011 8 56 120 24 2 # de HostsxSubred
+c 013 4 out_hosts 128 56 120 24 2 SAMPLE TEXT
+c 014 4 Label012 8 80 120 24 2 Mascara
+c 015 4 out_mask 128 80 120 24 2 SAMPLE TEXT
+c 016 4 Label017 8 112 120 24 2 Primeros 3 rangos
+c 017 4 out_range_first_1 16 136 232 24 2 SAMPLE TEXT
+c 018 4 out_range_first_2 16 160 232 24 2 SAMPLE TEXT
+c 019 4 out_range_first_3 16 184 232 24 2 SAMPLE TEXT
+c 020 4 Label021 8 216 120 24 2 Ultimos 3 rangos
+c 021 4 out_range_last_3 16 240 232 24 2 SAMPLE TEXT
+c 022 4 out_range_last_2 16 264 232 24 2 SAMPLE TEXT
+c 023 4 out_range_last_1 16 288 232 24 2 SAMPLE TEXT
+c 024 4 Label013 8 320 120 24 2 Tiempo tomado (s)
+c 025 4 out_time_taken 128 320 120 24 2 SAMPLE TEXT
