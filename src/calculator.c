@@ -125,3 +125,16 @@ const char* getMask(const int hosts_by_subnet) {
 
     return TextFormat("%d.%d.%d.%d", d, c, b, a);
 }
+
+const char* getRange(const char** ip_parts, const char ip_class, const int subnet, const int hosts_by_subnet) {
+    const int i = subnet; // Macro trick
+    const int lower = i * hosts_by_subnet;
+    const int upper = (i + 1) * hosts_by_subnet - 1;
+
+    switch (ip_class) {
+        case 'A': return TextFormat(IP_CLASS_A_FORMAT);
+        case 'B': return TextFormat(IP_CLASS_B_FORMAT);
+        case 'C': return TextFormat(IP_CLASS_C_FORMAT);
+        default: return "";
+    }
+}

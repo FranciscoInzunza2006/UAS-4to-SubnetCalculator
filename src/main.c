@@ -201,4 +201,12 @@ static void BtnCalculate() {
     TextCopy(out_hostsText,  TextFormat("%d", hosts_by_subnet));
     TextCopy(out_maskText,  getMask(hosts_by_subnet));
     TextCopy(out_time_takenText,  TextFormat("%.4f", time_taken));
+
+    TextCopy(out_range_first_1Text,  getRange(ip_parts, ip_class, 0, hosts_by_subnet));
+    TextCopy(out_range_first_2Text,  getRange(ip_parts, ip_class, 1, hosts_by_subnet));
+    TextCopy(out_range_first_3Text,  getRange(ip_parts, ip_class, 2, hosts_by_subnet));
+
+    TextCopy(out_range_last_1Text,  getRange(ip_parts, ip_class, subnet_amount-1, hosts_by_subnet));
+    TextCopy(out_range_last_2Text,  getRange(ip_parts, ip_class, subnet_amount-2, hosts_by_subnet));
+    TextCopy(out_range_last_3Text,  getRange(ip_parts, ip_class, subnet_amount-3, hosts_by_subnet));
 }
