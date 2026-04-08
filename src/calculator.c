@@ -110,3 +110,18 @@ void writeRangesToFile(const char** ip_parts, const char ip_class, const int sub
 
     fclose(out_file);
 }
+
+// Rounded
+const char* getMask(const int hosts_by_subnet) {
+    unsigned int mask = ~(hosts_by_subnet-1);
+
+    unsigned int a = mask % 256;
+    mask /= 256;
+    unsigned int b = mask % 256;
+    mask /= 256;
+    unsigned int c = mask % 256;
+    mask /= 256;
+    unsigned int d = mask % 256;
+
+    return TextFormat("%d.%d.%d.%d", d, c, b, a);
+}

@@ -11,6 +11,8 @@ int ipClassToBits(char ip_class);
 
 int BitsNeededToRepresentNumber(int target);
 
+const char* getMask(int hosts_by_subnet);
+
 void writeRangesToConsole(const char** ip_parts, char ip_class, int subnet_amount, int hosts_by_subnet);
 
 void writeRangesToFile(const char** ip_parts, char ip_class, int subnet_amount, int hosts_by_subnet);
