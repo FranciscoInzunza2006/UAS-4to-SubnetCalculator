@@ -81,11 +81,11 @@ void writeRangesToConsole(const char** ip_parts, const char ip_class, const int 
     }
 }
 
-void writeRangesToFile(const char** ip_parts, const char ip_class, const int subnet_amount, const int hosts_by_subnet) {
+bool writeRangesToFile(const char** ip_parts, const char ip_class, const int subnet_amount, const int hosts_by_subnet) {
     FILE* out_file = fopen("output.txt", "w");
     if (out_file == nullptr) {
         perror("Error opening output file");
-        return;
+        return false;
     }
 
     for (int i = 0; i < subnet_amount; i++) {
@@ -99,16 +99,17 @@ void writeRangesToFile(const char** ip_parts, const char ip_class, const int sub
                 break;
             case 'C': result = fprintf(out_file, IP_CLASS_C_FORMAT);
                 break;
-            default: exit(EXIT_FAILURE);
+            default: return false;
         }
 
         if (result <= 0) {
             perror("Error writing to file");
-            return;
+            return false;
         }
     }
 
     fclose(out_file);
+    return true;
 }
 
 // Rounded

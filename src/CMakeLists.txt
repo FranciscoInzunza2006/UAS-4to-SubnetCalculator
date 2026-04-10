@@ -1,5 +1,6 @@
 
 add_compile_options(-Wall -Wextra -pedantic -Werror -Wno-unused-parameter)
+add_compile_options(-O2 -Wno-unused-result)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 include_directories(${INCLUDE_DIR})
