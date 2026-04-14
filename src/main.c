@@ -183,7 +183,7 @@ static void BtnCalculate() {
     int hosts_by_subnet;
 
     int* target_value = in_target_type == 0 ? &subnet_amount : &hosts_by_subnet;
-    *target_value = in_target_value + 2; // 0 and Broadcast so we need 2 more than what the user asks
+    *target_value = in_target_value + 2 - 1; // 0 and Broadcast so we need 2 more than what the user asks
 
     const int bits_needed = BitsNeededToRepresentNumber(*target_value);
     if (bits_needed > bits_available - 2) {
