@@ -34,6 +34,7 @@ int in_target_type = 0;
 int in_target_value = 0;
 
 bool show_error_label = false;
+char out_ip_class[2] = "";
 char out_nets[64] = "";
 char out_hosts[64] = "";
 char out_mask[64] = "";
@@ -87,13 +88,13 @@ int main() {
         if (GuiTextBox((Rectangle){72, 48, 120, 24}, in_ip, IP_MAX_LENGTH, in_ipEditMode))
             in_ipEditMode = !in_ipEditMode;
 
-        GuiLabel((Rectangle){24, 80, 48, 24}, "Clase");
-        GuiToggleGroup((Rectangle){72, 80, 40, 24}, "A;B;C", &in_ip_classActive);
+        //GuiLabel((Rectangle){24, 80, 48, 24}, "Clase");
+        //GuiToggleGroup((Rectangle){72, 80, 40, 24}, "A;B;C", &in_ip_classActive);
 
         GuiLabel((Rectangle){24, 112, 48, 24}, "Usar");
         GuiToggleGroup((Rectangle){72, 112, 120, 24}, "Subredes;HostsxSubred", &in_target_type);
 
-        if (GuiValueBox((Rectangle){72, 144, 120, 24}, "Valor    ", &in_target_value, 0, INT_MAX, in_valueEditMode))
+        if (GuiValueBox((Rectangle){72, 144, 120, 24}, "Valor    ", &in_target_value, 1, INT_MAX, in_valueEditMode))
             in_valueEditMode = !in_valueEditMode;
 
         if (GuiButton((Rectangle){24, 176, 120, 24}, "Calcular")) BtnCalculate();
@@ -104,6 +105,9 @@ int main() {
             GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, 0xff0000ff);
             GuiLabel((Rectangle){344, 30, 120, 24}, "Error!");
             GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, 0x686868ff);
+        } else {
+            GuiLabel((Rectangle){344, 30, 120, 24}, "Clase");
+            GuiLabel((Rectangle){464, 30, 120, 24}, out_ip_class);
         }
 
         GuiLabel((Rectangle){344, 48, 120, 24}, "# de Redes");
@@ -147,6 +151,7 @@ int main() {
 static void BtnCalculate() {
     // Reset outs
     show_error_label = false;
+    out_ip_class[0] = '\0';
     out_nets[0] = '\0';
     out_hosts[0] = '\0';
     out_mask[0] = '\0';
@@ -167,16 +172,24 @@ static void BtnCalculate() {
     }
 
     char ip_class;
-    switch (in_ip_classActive) {
-        case 0: ip_class = 'A';
-            break;
-        case 1: ip_class = 'B';
-            break;
-        case 2: ip_class = 'C';
-            break;
-        default: show_error_label = true;
-            return;
+    const int ip_thingy = TextToInteger(ip_parts[0]);
+    if (ip_thingy < 128) ip_class = 'A';
+    else if (ip_thingy < 192) ip_class = 'B';
+    else if (ip_thingy < 224) ip_class = 'C';
+    else {
+        show_error_label = true;
+        return;
     }
+    // switch (in_ip_classActive) {
+    //     case 0: ip_class = 'A';
+    //         break;
+    //     case 1: ip_class = 'B';
+    //         break;
+    //     case 2: ip_class = 'C';
+    //         break;
+    //     default: show_error_label = true;
+    //         return;
+    // }
     const int bits_available = ipClassToBits(ip_class);
 
     int subnet_amount;
@@ -211,6 +224,7 @@ static void BtnCalculate() {
     const clock_t end = clock();
     const double time_taken = (float) (end - start) / CLOCKS_PER_SEC;
 
+    out_ip_class[0] = ip_class;
     TextCopy(out_nets, TextFormat("%d", subnet_amount));
     TextCopy(out_hosts, TextFormat("%d", hosts_by_subnet));
     TextCopy(out_mask, getMask(hosts_by_subnet));
